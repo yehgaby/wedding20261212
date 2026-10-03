@@ -10,31 +10,8 @@
     toastTimer = window.setTimeout(() => toast.classList.remove("is-visible"), 2400);
   }
 
-  const menuButton = document.querySelector(".menu-toggle");
-  const nav = document.querySelector("#site-nav");
-  menuButton?.addEventListener("click", () => {
-    const isOpen = menuButton.getAttribute("aria-expanded") === "true";
-    menuButton.setAttribute("aria-expanded", String(!isOpen));
-    menuButton.setAttribute("aria-label", isOpen ? "開啟導覽選單" : "關閉導覽選單");
-    nav?.classList.toggle("is-open", !isOpen);
-  });
-  nav?.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => {
-    nav.classList.remove("is-open");
-    menuButton?.setAttribute("aria-expanded", "false");
-    menuButton?.setAttribute("aria-label", "開啟導覽選單");
-  }));
-
   document.querySelectorAll('[data-action="print"]').forEach((button) => {
     button.addEventListener("click", () => window.print());
-  });
-
-  document.querySelector('[data-action="copy-address"]')?.addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText("台中市烏日區溫泉路 2 號");
-      announce("地址已複製");
-    } catch {
-      announce("地址：台中市烏日區溫泉路 2 號");
-    }
   });
 
   document.querySelector('[data-action="calendar"]')?.addEventListener("click", () => {
@@ -45,9 +22,9 @@
       "CALSCALE:GREGORIAN",
       "BEGIN:VEVENT",
       "UID:wedding-20261212-happiness-bank",
-      "DTSTAMP:20261003T000000Z",
-      "DTSTART:20261212T113000",
-      "SUMMARY:永軒 & 李昀蓁 婚宴",
+      `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "")}`,
+      "DTSTART:20261212T033000Z",
+      "SUMMARY:永軒 & 昀蓁 婚宴",
       "LOCATION:清新溫泉飯店\\, 台中市烏日區溫泉路 2 號",
       "DESCRIPTION:迎賓 11:30；開席 12:00。誠摯邀請您見證我們的幸福。",
       "END:VEVENT",
@@ -57,7 +34,7 @@
     const url = URL.createObjectURL(file);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "永軒與李昀蓁-婚宴.ics";
+    link.download = "永軒與昀蓁-婚宴.ics";
     document.body.append(link);
     link.click();
     link.remove();
@@ -65,12 +42,36 @@
     announce("行事曆檔案已下載");
   });
 
-  const countdown = document.querySelector("#countdown");
-  if (countdown) {
-    const eventDate = new Date(2026, 11, 12);
-    const today = new Date();
-    const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const days = Math.ceil((eventDate - todayDate) / 86400000);
-    countdown.textContent = days > 0 ? `${days} 天` : days === 0 ? "就是今天" : "幸福已入帳";
-  }
+  const form = document.querySelector("#rsvp-form");
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+
+    const values = new FormData(form);
+    const guestName = String(values.get("guestName")).trim();
+    const attendance = String(values.get("attendance"));
+    const guestCount = String(values.get("guestCount"));
+    const countLine = attendance === "出席" ? `出席人數：${guestCount} 位` : "出席人數：不適用";
+    const reply = `永軒、昀蓁好，我是${guestName}。\n${attendance}\n${countLine}\n期待 2026 年 12 月 12 日見！`;
+    const help = document.querySelector("#rsvp-help");
+
+    try {
+      await navigator.clipboard.writeText(reply);
+      if (help) help.textContent = "回覆內容已複製，請貼回收到喜帖的對話送出。";
+    } catch {
+      const copyBuffer = document.createElement("textarea");
+      copyBuffer.value = reply;
+      copyBuffer.setAttribute("readonly", "");
+      copyBuffer.style.position = "fixed";
+      copyBuffer.style.opacity = "0";
+      document.body.append(copyBuffer);
+      copyBuffer.select();
+      const copied = document.execCommand("copy");
+      copyBuffer.remove();
+      if (help) help.textContent = copied
+        ? "回覆內容已複製，請貼回收到喜帖的對話送出。"
+        : `請複製以下回覆並貼回邀請對話：${reply}`;
+    }
+    announce("RSVP 回覆信息已準備好，請貼回LINE對話 !!");
+  });
 })();
