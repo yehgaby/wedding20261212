@@ -43,21 +43,40 @@
   });
 
   const form = document.querySelector("#rsvp-form");
-  form?.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    if (!form.reportValidity()) return;
-
+  function getRsvpReply() {
+    if (!form?.reportValidity()) return null;
     const values = new FormData(form);
     const guestName = String(values.get("guestName")).trim();
     const attendance = String(values.get("attendance"));
     const guestCount = String(values.get("guestCount"));
-    const countLine = attendance === "出席" ? `出席人數：${guestCount} 位` : "出席人數：不適用";
-    const reply = `永軒、昀蓁好，我是${guestName}。\n${attendance}\n${countLine}\n期待 2026 年 12 月 12 日見！`;
-    const help = document.querySelector("#rsvp-help");
+    const status = attendance === "出席" ? "出席 ❤️" : "不克出席";
+    const countLine = attendance === "出席" ? `出席人數：${guestCount} 位` : "";
+    const reply = [
+      "【永軒＆昀蓁 12.12 婚禮出席回覆】",
+      "",
+      `姓名：${guestName}`,
+      `出席狀況：${status}`,
+      countLine
+    ].filter(Boolean).join("\n");
+    return reply;
+  }
+
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const reply = getRsvpReply();
+    if (!reply) return;
+    const lineUrl = `https://line.me/R/oaMessage/%40634ydtgf/?${encodeURIComponent(reply)}`;
+
+    announce("即將開啟 LINE，請確認後傳送回覆");
+    window.location.href = lineUrl;
+  });
+
+  document.querySelector("#rsvp-copy")?.addEventListener("click", async () => {
+    const reply = getRsvpReply();
+    if (!reply) return;
 
     try {
       await navigator.clipboard.writeText(reply);
-      if (help) help.textContent = "回覆內容已複製，請貼回收到喜帖的對話送出。";
     } catch {
       const copyBuffer = document.createElement("textarea");
       copyBuffer.value = reply;
@@ -68,10 +87,11 @@
       copyBuffer.select();
       const copied = document.execCommand("copy");
       copyBuffer.remove();
-      if (help) help.textContent = copied
-        ? "回覆內容已複製，請貼回收到喜帖的對話送出。"
-        : `請複製以下回覆並貼回邀請對話：${reply}`;
+      if (!copied) {
+        announce("無法自動複製，請再試一次或手動回覆");
+        return;
+      }
     }
-    announce("RSVP 回覆信息已準備好，請貼回LINE對話 !!");
+    announce("回覆內容已複製，可貼到 LINE 傳送");
   });
 })();
