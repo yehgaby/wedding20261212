@@ -184,7 +184,11 @@ th:last-child, td:last-child { text-align: right; }
 .service h3 .en { margin-left: 6px; color: var(--muted); font-size: 10px; font-weight: 500; }
 .service p { margin: 0; color: #4f5552; font-size: 13px; line-height: 1.7; }
 .service-list { margin-top: 7px; color: var(--teal); font-size: 11px; letter-spacing: .025em; }
+.line-print-qr { display: none; }
 .service-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-content: center; }
+.calendar-options { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding-top: 2px; }
+.calendar-options[hidden] { display: none; }
+.calendar-options .mini-action { min-height: 52px; }
 .mini-action { appearance: none; display: flex; min-width: 0; min-height: 58px; flex-direction: column; justify-content: center; align-items: flex-start; gap: 4px; padding: 9px 11px; border: 1px solid #c4cbc4; border-radius: 3px; color: var(--teal); background: #fbfaf6; box-shadow: 0 1px 2px #20241f0a; font-family: inherit; font-size: 11px; font-weight: 700; line-height: 1.4; text-align: left; text-decoration: none; cursor: pointer; transition: border-color .18s, color .18s, background .18s, transform .18s, box-shadow .18s; }
 .rsvp-link { border-color: var(--teal); color: #fffefa; background: var(--teal); }
 .rsvp-link small { color: #e3ebe5; }
@@ -304,6 +308,7 @@ footer .print-date { text-align: right; }
 @media (max-width: 390px) {
   .recipient .status-value .value { font-size: 12px; }
   .service-actions { grid-template-columns: 1fr; }
+  .calendar-options { grid-template-columns: 1fr; }
   .section-heading { gap: 7px; }
   .section-no { width: 24px; height: 23px; }
   h2 { font-size: 15px; }
@@ -317,9 +322,9 @@ footer .print-date { text-align: right; }
   @page { size: A4 portrait; margin: 0; }
   html, body { width: auto; min-height: 0; background: #fff; }
   body { color: #202522; font-size: 8pt; line-height: 1.35; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-  .sheet { display: flex; width: 210mm; height: 297mm; min-height: 0; flex-direction: column; margin: 0; padding: 0 10mm; overflow: hidden; box-shadow: none; }
+  .sheet { display: flex; width: 210mm; height: 297mm; min-height: 0; flex-direction: column; margin: 0; padding: 5mm 10mm; overflow: hidden; box-shadow: none; }
   .top-rule { position: absolute; top: 0; right: 10mm; left: 10mm; height: 2mm; margin: 0; }
-  header { order: 1; flex: 0 0 44mm; min-height: 0; padding-top: 5mm; }
+  header { order: 1; flex: 0 0 43mm; min-height: 0; padding-top: 4mm; }
   .masthead { gap: 12mm; padding-bottom: 1.5mm; }
   .brand { gap: 2mm; }
   .brand-mark { width: 8mm; height: 8mm; }
@@ -333,7 +338,7 @@ footer .print-date { text-align: right; }
   .recipient .label { font-size: 5.5pt; }
   .recipient .value { margin-top: 0; font-size: 8pt; }
   .recipient .holder .value { font-size: 10pt; }
-  .ad { order: 3; flex: 0 0 52mm; height: 52mm; min-height: 52mm; margin: 0; break-inside: avoid; }
+  .ad { order: 3; flex: 0 0 51mm; height: 51mm; min-height: 51mm; margin: 0; break-inside: avoid; }
   .ad > img { object-position: center 37%; }
   .ad-copy { right: 7mm; bottom: 4mm; left: 7mm; }
   .ad-kicker { font-size: 8pt; }
@@ -342,13 +347,13 @@ footer .print-date { text-align: right; }
   .ad-copy .signature { font-size: 7pt; }
   .seal { top: 5mm; right: 6mm; width: 18mm; height: 18mm; border-radius: 50%; font-size: 20pt; }
   .masthead-seal { top: 25mm; }
-  .greeting { order: 2; flex: 0 0 55mm; display: block; padding: 4mm 1mm; align-self: stretch; border-bottom: .25mm dashed #aeb2ac; }
+  .greeting { order: 2; flex: 0 0 53mm; display: block; padding: 3mm 1mm; align-self: stretch; border-bottom: .25mm dashed #aeb2ac; }
   .eyebrow { font-size: 8pt; }
   .greeting p { margin: 2mm 0; font-size: 10pt; line-height: 1.6; }
   .effective { margin-top: 2mm; padding: 0 0 0 3mm; font-size: 8pt; }
   .effective b { display: inline; margin-right: 2mm; font-size: 17pt; }
   .effective > span:last-child { display: inline; }
-  .overview { order: 4; display: block; flex: 0 0 47mm; min-width: 0; padding: 2mm 0; border-bottom: .25mm dashed #aeb2ac; }
+  .overview { order: 4; display: block; flex: 0 0 44mm; min-width: 0; padding: 1.5mm 0; border-bottom: .25mm dashed #aeb2ac; }
   .ledger-grid, .terms { display: none !important; }
   .section-heading { gap: 1.5mm; margin-bottom: 1mm; padding-bottom: .75mm; }
   .section-no { width: 5mm; height: 4.5mm; font-size: 5pt; }
@@ -380,18 +385,22 @@ footer .print-date { text-align: right; }
   .investment .section-heading { margin-bottom: .5mm; }
   .status { font-size: 4.5pt; }
   .account-note { margin-top: 1mm; padding: 1mm; font-size: 5.5pt; line-height: 1.3; }
-  .wedding { order: 5; flex: 0 0 48mm; min-width: 0; margin: 0; padding-top: 2mm; align-self: stretch; }
-  .wedding-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wedding { order: 5; flex: 0 0 46mm; min-width: 0; margin: 0; padding-top: 1.5mm; align-self: stretch; }
+  .wedding-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 34mm; grid-template-rows: repeat(3, minmax(8mm, auto)); }
   .wedding-grid > div { padding: 2mm; }
   .wedding-grid .label { font-size: 6.5pt; }
   .wedding-grid .value { margin-top: .5mm; font-size: 8pt; line-height: 1.3; }
-  .service { order: 6; flex: 0 0 41mm; display: block; min-width: 0; margin: 0; padding: 2mm 3mm; align-self: stretch; }
-  .service h3 { margin-bottom: 1mm; font-size: 10pt; }
-  .service h3 .en { font-size: 7pt; }
-  .service p { font-size: 7.5pt; line-height: 1.4; }
-  .service-list { margin-top: 1mm; font-size: 6.5pt; line-height: 1.35; }
+  .service { order: 6; flex: 0 0 42mm; display: block; min-width: 0; margin: 0; padding: 2mm 3mm; align-self: stretch; }
+  .line-print-qr { grid-column: 3; grid-row: 1 / span 3; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1mm; padding: 1mm; border-left: .25mm solid #aeb2ac; }
+  .line-print-qr img { display: block; width: 25mm; height: 25mm; }
+  .line-print-qr div { display: grid; gap: .5mm; font-size: 5.5pt; line-height: 1.2; text-align: center; }
+  .line-print-qr strong { font-size: 6.5pt; }
+  .service h3 { margin-bottom: 1mm; padding-bottom: .75mm; border-bottom: .25mm solid #c9cbc4; font-size: 9pt; }
+  .service h3 .en { font-size: 6pt; }
+  .service p { font-size: 7.5pt; line-height: 1.45; }
+  .service-list { margin-top: 1.5mm; font-size: 6.5pt; line-height: 1.4; }
   .service-actions, .screen-only { display: none !important; }
-  footer { order: 7; flex: 0 0 10mm; margin-top: 0; padding-top: 1.5mm; font-size: 5pt; break-inside: avoid; }
+  footer { order: 7; flex: 0 0 8mm; margin-top: 0; padding-top: 1mm; font-size: 5pt; break-inside: avoid; }
   footer .page { font-size: 6pt; }
   .toast { display: none !important; }
   .sheet, .ad, .greeting, .overview, .wedding, .service, footer { break-inside: avoid; page-break-inside: avoid; }

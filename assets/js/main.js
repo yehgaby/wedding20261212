@@ -14,7 +14,7 @@
     button.addEventListener("click", () => window.print());
   });
 
-  document.querySelector('[data-action="calendar"]')?.addEventListener("click", () => {
+  function createCalendarFile() {
     const calendar = [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
@@ -30,17 +30,55 @@
       "END:VEVENT",
       "END:VCALENDAR"
     ].join("\r\n");
-    const file = new Blob(["\uFEFF", calendar], { type: "text/calendar;charset=utf-8" });
+    return new File(["\uFEFF", calendar], "永軒與昀蓁-婚宴.ics", { type: "text/calendar;charset=utf-8" });
+  }
+
+  function openCalendarFile() {
+    const file = createCalendarFile();
     const url = URL.createObjectURL(file);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "永軒與昀蓁-婚宴.ics";
+    link.target = "_blank";
+    link.rel = "noopener";
     document.body.append(link);
     link.click();
     link.remove();
-    URL.revokeObjectURL(url);
-    announce("行事曆檔案已下載");
+    window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    announce("已開啟行事曆邀請，請確認並加入");
+  }
+
+  async function shareCalendarFile() {
+    const file = createCalendarFile();
+    if (navigator.canShare?.({ files: [file] }) && navigator.share) {
+      try {
+        await navigator.share({ files: [file], title: "永軒與昀蓁 婚宴" });
+      } catch (error) {
+        if (error.name !== "AbortError") announce("分享未完成，請改用 Apple 或 Google 行事曆");
+      }
+      return;
+    }
+
+    const url = URL.createObjectURL(file);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = file.name;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    announce("已下載 .ics 邀請檔，可用其他行事曆匯入");
+  }
+
+  const calendarButton = document.querySelector('[data-action="calendar"]');
+  const calendarOptions = document.querySelector("#calendar-options");
+  calendarButton?.addEventListener("click", () => {
+    const isExpanded = calendarButton.getAttribute("aria-expanded") === "true";
+    calendarButton.setAttribute("aria-expanded", String(!isExpanded));
+    calendarOptions.hidden = isExpanded;
   });
+
+  document.querySelector('[data-calendar-option="apple"]')?.addEventListener("click", openCalendarFile);
+  document.querySelector('[data-calendar-option="share"]')?.addEventListener("click", shareCalendarFile);
 
   const form = document.querySelector("#rsvp-form");
   function getRsvpReply() {
